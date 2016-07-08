@@ -1,7 +1,10 @@
+SHORT_NAME := swift-onlyone
+DEIS_REGISTY ?= ${DEV_REGISTRY}/
+IMAGE_PREFIX ?= deis
 
+include versioning.mk
 SWIFT_USER_PASSWORD=testing
 CNTR=onlyone
-CNTR_IMAGE=swift-onlyone
 DATA_CNTR=SWIFT_DATA
 DATA_CNTR_IMAGE=busybox
 LOCAL_PORT=12345
@@ -15,7 +18,7 @@ run_swift_data:
 	-docker run \
   	-v /srv \
 	--name $(DATA_CNTR) \
-    $(DATA_CNTR_IMAGE)	
+    $(DATA_CNTR_IMAGE)
 
 run_swift:
 	docker run \
@@ -25,16 +28,17 @@ run_swift:
 	-d \
 	-p $(LOCAL_PORT):$(DOCKER_PORT) \
 	--volumes-from $(DATA_CNTR) \
-	-t $(CNTR_IMAGE) 
+	-t $(IMAGE)
 
 delete:
-	-docker rm -f $(CNTR) 
+	-docker rm -f $(CNTR)
 
 bash:
 	docker exec -i -t $(CNTR) /bin/bash
 
 build:
-	docker build -t $(CNTR_IMAGE) .
+	docker build --rm -t ${IMAGE} .
+	docker tag ${IMAGE} ${MUTABLE_IMAGE}
 
 logs:
-	docker logs $(CNTR) 
+	docker logs $(CNTR)
