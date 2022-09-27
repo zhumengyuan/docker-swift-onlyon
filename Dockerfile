@@ -1,14 +1,17 @@
-FROM ubuntu:14.04
+FROM ubuntu:20.04
 MAINTAINER curtis <curtis@serverascode.com>
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Shanghai
 
 RUN apt-get update
 RUN apt-get install -y software-properties-common
-RUN add-apt-repository cloud-archive:liberty
+RUN add-apt-repository cloud-archive:yoga
 RUN apt-get update
-RUN apt-get install -y supervisor swift python-swiftclient rsync \
-                       swift-proxy swift-object memcached python-keystoneclient \
-                       python-swiftclient swift-plugin-s3 python-netifaces \
-                       python-xattr python-memcache \
+RUN apt-get install -y supervisor swift python3-swiftclient rsync \
+                       swift-proxy swift-object memcached python3-keystoneclient \
+                       python3-netifaces \
+                       xattr python3-memcache \
                        swift-account swift-container swift-object pwgen
 
 RUN mkdir -p /var/log/supervisor
@@ -30,6 +33,7 @@ ADD files/container-server.conf /etc/swift/container-server.conf
 ADD files/proxy-server.conf /etc/swift/proxy-server.conf
 ADD files/startmain.sh /usr/local/bin/startmain.sh
 RUN chmod 755 /usr/local/bin/startmain.sh
+RUN touch /var/log/syslog
 
 EXPOSE 8080
 
